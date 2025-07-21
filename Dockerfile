@@ -25,5 +25,8 @@ COPY --from=builder /usr/src/app/package*.json ./
 # Install production dependencies
 RUN npm install --production
 
+# Set environment variables for Node.js crypto support
+ENV NODE_OPTIONS="--experimental-global-webcrypto"
+
 EXPOSE 10000
 CMD ["node", "dist/main.js"]

@@ -1,14 +1,9 @@
+// Import crypto polyfill before anything else
+import './crypto-polyfill';
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
-
-// Polyfill for crypto.randomUUID if not available
-if (typeof globalThis.crypto === 'undefined') {
-  const crypto = require('crypto');
-  (globalThis as any).crypto = {
-    randomUUID: () => crypto.randomUUID(),
-  };
-}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
