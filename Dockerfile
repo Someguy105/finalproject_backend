@@ -25,11 +25,5 @@ COPY --from=builder /usr/src/app/package*.json ./
 # Install production dependencies
 RUN npm install --production
 
-COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/package*.json ./
-
-# Install production dependencies
-RUN npm install --production
-
 EXPOSE 10000
 CMD ["node", "dist/main.js"]
