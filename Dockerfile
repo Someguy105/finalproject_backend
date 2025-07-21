@@ -1,5 +1,5 @@
 # Use official Node.js image
-FROM node:18-alpine@sha256:7e2e4b2e8e2b7a2e6e8e2e4b2e8e2b7a2e6e8e2e4b2e8e2b7a2e6e8e2e4b2e8e2
+FROM node:18-alpine@sha256:2c40cd44aadd2d6a5835fc1c3d07e60b8b965eef64e5b82a49f19b56a1c5f6a9
 
 # Set working directory
 WORKDIR /usr/src/app
