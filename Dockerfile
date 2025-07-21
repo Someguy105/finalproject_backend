@@ -1,10 +1,12 @@
 # Stage 1: Build
-FROM node:18 AS builder
+FROM node:18-slim AS builder
 
 WORKDIR /usr/src/app
 
-# Install required system dependencies
-RUN apt-get update && apt-get install -y python3 make g++
+# Install essential build tools and openssl
+RUN apt-get update && \
+    apt-get install -y build-essential python3 openssl && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY package*.json ./
 RUN npm install
@@ -12,12 +14,13 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production
-FROM node:18
+FROM node:18-slim
 
 WORKDIR /usr/src/app
 
 # Install openssl for crypto support
-RUN apt-get update && apt-get install -y openssl && \
+RUN apt-get update && \
+    apt-get install -y openssl && \
     rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/src/app/dist ./dist
