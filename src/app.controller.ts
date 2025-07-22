@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Query, Put, Delete, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
 import { DatabaseService } from './database.service';
+import { SeedDataService } from './seed-data.service';
 import { LogLevel, LogCategory } from './schemas/log.schema';
 import { JwtAuthGuard, RolesGuard, Roles, Role, CurrentUser, ParseMongoIdPipe } from './common';
 import { JwtPayload } from './auth/interfaces/jwt-payload.interface';
@@ -10,6 +11,7 @@ export class AppController {
   constructor(
     private readonly appService: AppService,
     private readonly databaseService: DatabaseService,
+    private readonly seedDataService: SeedDataService,
   ) {}
 
   @Get()
@@ -82,6 +84,24 @@ export class AppController {
   async seedDefaultUsersAdmin(@CurrentUser() user: JwtPayload) {
     console.log(`Seed users requested by admin user: ${user.email}`);
     return await this.databaseService.seedDefaultUsers();
+  }
+
+  @Post('dev/seed-all-data')
+  async seedAllData() {
+    // Only allow in development/testing environments
+    if (process.env.NODE_ENV === 'production') {
+      return { success: false, message: 'Data seeding not allowed in production' };
+    }
+    console.log('Development seed all data requested');
+    return await this.seedDataService.seedAllData();
+  }
+
+  @Post('admin/seed-all-data')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async seedAllDataAdmin(@CurrentUser() user: JwtPayload) {
+    console.log(`Seed all data requested by admin user: ${user.email}`);
+    return await this.seedDataService.seedAllData();
   }
 
   @Get('users')

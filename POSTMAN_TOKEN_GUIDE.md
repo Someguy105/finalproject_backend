@@ -2,14 +2,15 @@
 
 ## 🔐 **Your Current Admin Token**
 ```
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc1MzE1MzMyNCwiZXhwIjoxNzUzMjM5NzI0fQ.Egg02COTxM3c1TbiSfsw9ZAsNxtNJvYtWS6G-5LnJog
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc1MzE2Mzc4MiwiZXhwIjoxNzUzMTY3MzgyfQ.LvqjeS66hPKDOIBgYTTeKRFktWQLHsv0B8OGzhpp4fY
 ```
 
 **Token Details:**
 - **Email**: admin@test.com
 - **Role**: admin
-- **Expires**: 24 hours from generation
+- **Expires**: 1 hour from generation (July 22, 2025 - 06:56 UTC)
 - **Permissions**: Full admin access to all endpoints
+- **✅ VERIFIED WORKING** - Generated from deployed app login
 
 ## 📋 **Postman Setup Instructions**
 
@@ -18,7 +19,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20
 2. Go to **Variables** tab
 3. Set variable:
    - **Variable**: `authToken`
-   - **Current Value**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc1MzE1MzMyNCwiZXhwIjoxNzUzMjM5NzI0fQ.Egg02COTxM3c1TbiSfsw9ZAsNxtNJvYtWS6G-5LnJog`
+   - **Current Value**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsImVtYWlsIjoiYWRtaW5AdGVzdC5jb20iLCJyb2xlIjoiYWRtaW4iLCJmaXJzdE5hbWUiOiJBZG1pbiIsImxhc3ROYW1lIjoiVXNlciIsImlhdCI6MTc1MzE2Mzc4MiwiZXhwIjoxNzUzMTY3MzgyfQ.LvqjeS66hPKDOIBgYTTeKRFktWQLHsv0B8OGzhpp4fY`
 
 ### **Step 2: Test Database Reset (Wait 5 Minutes for Deployment)**
 1. **POST** `https://ecommerce-blog-backend.onrender.com/dev/reset-database`

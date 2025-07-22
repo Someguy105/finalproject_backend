@@ -9,6 +9,7 @@ import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseService } from './database.service';
+import { SeedDataService } from './seed-data.service';
 import { User } from './entities/user.entity';
 import { Product } from './entities/product.entity';
 import { Category } from './entities/category.entity';
@@ -109,6 +110,7 @@ import {
   providers: [
     AppService, 
     DatabaseService,
+    SeedDataService,
     
     // Global Filters
     {
