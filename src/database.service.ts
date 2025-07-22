@@ -348,22 +348,22 @@ export class DatabaseService {
       console.log('Starting database reset...');
       
       // Instead of using session_replication_role, manually handle dependencies
-      // Delete data in correct order to avoid foreign key constraints
+      // Use TRUNCATE or DELETE FROM to clear all data
       
-      // 1. Clear all data first (this preserves table structure)
-      await this.orderItemRepository.delete({});
+      // 1. Clear all data using raw SQL to avoid TypeORM empty criteria restrictions
+      await this.orderItemRepository.query('DELETE FROM "order_items"');
       console.log('Cleared order_items table');
       
-      await this.orderRepository.delete({});
+      await this.orderRepository.query('DELETE FROM "orders"');
       console.log('Cleared orders table');
       
-      await this.productRepository.delete({});
+      await this.productRepository.query('DELETE FROM "products"');
       console.log('Cleared products table');
       
-      await this.categoryRepository.delete({});
+      await this.categoryRepository.query('DELETE FROM "categories"');
       console.log('Cleared categories table');
       
-      await this.userRepository.delete({});
+      await this.userRepository.query('DELETE FROM "app_users"');
       console.log('Cleared users table');
       
       // 2. Clear MongoDB collections
