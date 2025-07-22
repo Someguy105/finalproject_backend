@@ -342,32 +342,54 @@ export class DatabaseService {
     });
   }
 
-  // Database reset functionality
+  // Database reset functionality - Updated for hosted PostgreSQL
   async resetDatabase(): Promise<{ success: boolean; message: string }> {
     try {
-      // First, disable foreign key checks temporarily
-      await this.userRepository.query('SET session_replication_role = replica;');
+      console.log('Starting database reset...');
       
-      // Drop all tables in correct order with CASCADE to handle dependencies
-      await this.orderItemRepository.query('DROP TABLE IF EXISTS "order_items" CASCADE');
-      await this.orderRepository.query('DROP TABLE IF EXISTS "orders" CASCADE');
-      await this.productRepository.query('DROP TABLE IF EXISTS "products" CASCADE');
-      await this.categoryRepository.query('DROP TABLE IF EXISTS "categories" CASCADE');
-      await this.userRepository.query('DROP TABLE IF EXISTS "app_users" CASCADE');
+      // Instead of using session_replication_role, manually handle dependencies
+      // Delete data in correct order to avoid foreign key constraints
       
-      // Drop any other tables that might exist from old schema
-      await this.userRepository.query('DROP TABLE IF EXISTS "discount_categories" CASCADE');
-      await this.userRepository.query('DROP TABLE IF EXISTS "discounts" CASCADE');
-      await this.userRepository.query('DROP TABLE IF EXISTS "migrations" CASCADE');
+      // 1. Clear all data first (this preserves table structure)
+      await this.orderItemRepository.delete({});
+      console.log('Cleared order_items table');
       
-      // Re-enable foreign key checks
-      await this.userRepository.query('SET session_replication_role = DEFAULT;');
+      await this.orderRepository.delete({});
+      console.log('Cleared orders table');
       
-      console.log('All tables dropped successfully. TypeORM will recreate them on next connection.');
+      await this.productRepository.delete({});
+      console.log('Cleared products table');
+      
+      await this.categoryRepository.delete({});
+      console.log('Cleared categories table');
+      
+      await this.userRepository.delete({});
+      console.log('Cleared users table');
+      
+      // 2. Clear MongoDB collections
+      await this.reviewModel.deleteMany({});
+      console.log('Cleared reviews collection');
+      
+      await this.logModel.deleteMany({});
+      console.log('Cleared logs collection');
+      
+      // 3. Reset sequences to start from 1
+      try {
+        await this.userRepository.query('ALTER SEQUENCE "app_users_id_seq" RESTART WITH 1');
+        await this.categoryRepository.query('ALTER SEQUENCE "categories_id_seq" RESTART WITH 1');
+        await this.productRepository.query('ALTER SEQUENCE "products_id_seq" RESTART WITH 1');
+        await this.orderRepository.query('ALTER SEQUENCE "orders_id_seq" RESTART WITH 1');
+        await this.orderItemRepository.query('ALTER SEQUENCE "order_items_id_seq" RESTART WITH 1');
+        console.log('Reset all sequences successfully');
+      } catch (seqError) {
+        console.warn('Some sequences could not be reset (they may not exist yet):', seqError.message);
+      }
+      
+      console.log('Database reset completed successfully');
       
       return {
         success: true,
-        message: 'Database reset successfully. All tables dropped with CASCADE. TypeORM will recreate them with correct schema on next restart.'
+        message: 'Database reset successfully. All data cleared and sequences reset. Tables preserved with correct schema.'
       };
     } catch (error) {
       console.error('Database reset failed:', error);
