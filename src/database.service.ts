@@ -551,6 +551,107 @@ export class DatabaseService {
     };
   }
 
+  // Manually recreate database schema - useful after hard reset
+  async recreateSchema(): Promise<{ success: boolean; message: string }> {
+    try {
+      console.log('Starting manual schema recreation...');
+      
+      // Create tables manually using raw SQL
+      // 1. Create users table
+      await this.userRepository.query(`
+        CREATE TABLE IF NOT EXISTS "app_users" (
+          "id" SERIAL PRIMARY KEY,
+          "email" VARCHAR UNIQUE NOT NULL,
+          "password" VARCHAR NOT NULL,
+          "firstName" VARCHAR NOT NULL,
+          "lastName" VARCHAR NOT NULL,
+          "role" VARCHAR NOT NULL DEFAULT 'customer',
+          "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
+        )
+      `);
+      console.log('Created app_users table');
+
+      // 2. Create categories table
+      await this.categoryRepository.query(`
+        CREATE TABLE IF NOT EXISTS "categories" (
+          "id" SERIAL PRIMARY KEY,
+          "name" VARCHAR NOT NULL,
+          "description" TEXT,
+          "sortOrder" INTEGER DEFAULT 0,
+          "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
+        )
+      `);
+      console.log('Created categories table');
+
+      // 3. Create products table
+      await this.productRepository.query(`
+        CREATE TABLE IF NOT EXISTS "products" (
+          "id" SERIAL PRIMARY KEY,
+          "name" VARCHAR NOT NULL,
+          "description" TEXT,
+          "price" DECIMAL(10,2) NOT NULL,
+          "stock" INTEGER NOT NULL DEFAULT 0,
+          "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "categoryId" INTEGER,
+          "imageUrl" VARCHAR,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE SET NULL
+        )
+      `);
+      console.log('Created products table');
+
+      // 4. Create orders table
+      await this.orderRepository.query(`
+        CREATE TABLE IF NOT EXISTS "orders" (
+          "id" SERIAL PRIMARY KEY,
+          "userId" INTEGER NOT NULL,
+          "status" VARCHAR NOT NULL DEFAULT 'pending',
+          "total" DECIMAL(10,2) NOT NULL,
+          "shippingAddress" TEXT,
+          "billingAddress" TEXT,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          FOREIGN KEY ("userId") REFERENCES "app_users"("id") ON DELETE CASCADE
+        )
+      `);
+      console.log('Created orders table');
+
+      // 5. Create order_items table
+      await this.orderItemRepository.query(`
+        CREATE TABLE IF NOT EXISTS "order_items" (
+          "id" SERIAL PRIMARY KEY,
+          "orderId" INTEGER NOT NULL,
+          "productId" INTEGER NOT NULL,
+          "quantity" INTEGER NOT NULL,
+          "price" DECIMAL(10,2) NOT NULL,
+          "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE CASCADE,
+          FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE CASCADE
+        )
+      `);
+      console.log('Created order_items table');
+
+      console.log('Manual schema recreation completed successfully');
+      
+      return {
+        success: true,
+        message: 'Database schema recreated successfully. All tables are now available for use.'
+      };
+    } catch (error) {
+      console.error('Schema recreation failed:', error);
+      return {
+        success: false,
+        message: `Schema recreation failed: ${error.message}`
+      };
+    }
+  }
+
   // Seed default users for testing
   async seedDefaultUsers(): Promise<{ message: string; users: Partial<User>[] }> {
     const defaultUsers = [

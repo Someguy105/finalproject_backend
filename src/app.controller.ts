@@ -70,6 +70,12 @@ export class AppController {
     return await this.databaseService.seedDefaultUsers();
   }
 
+  @Post('dev/recreate-schema')
+  async recreateSchema() {
+    console.log('Recreating database schema...');
+    return await this.databaseService.recreateSchema();
+  }
+
   @Post('admin/seed-users')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
