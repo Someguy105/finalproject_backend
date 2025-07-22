@@ -341,6 +341,42 @@ export class DatabaseService {
     });
   }
 
+  // Database reset functionality
+  async resetDatabase(): Promise<{ success: boolean; message: string }> {
+    try {
+      // First, disable foreign key checks temporarily
+      await this.userRepository.query('SET session_replication_role = replica;');
+      
+      // Drop all tables in correct order with CASCADE to handle dependencies
+      await this.orderItemRepository.query('DROP TABLE IF EXISTS "order_items" CASCADE');
+      await this.orderRepository.query('DROP TABLE IF EXISTS "orders" CASCADE');
+      await this.productRepository.query('DROP TABLE IF EXISTS "products" CASCADE');
+      await this.categoryRepository.query('DROP TABLE IF EXISTS "categories" CASCADE');
+      await this.userRepository.query('DROP TABLE IF EXISTS "app_users" CASCADE');
+      
+      // Drop any other tables that might exist from old schema
+      await this.userRepository.query('DROP TABLE IF EXISTS "discount_categories" CASCADE');
+      await this.userRepository.query('DROP TABLE IF EXISTS "discounts" CASCADE');
+      await this.userRepository.query('DROP TABLE IF EXISTS "migrations" CASCADE');
+      
+      // Re-enable foreign key checks
+      await this.userRepository.query('SET session_replication_role = DEFAULT;');
+      
+      console.log('All tables dropped successfully. TypeORM will recreate them on next connection.');
+      
+      return {
+        success: true,
+        message: 'Database reset successfully. All tables dropped with CASCADE. TypeORM will recreate them with correct schema on next restart.'
+      };
+    } catch (error) {
+      console.error('Database reset failed:', error);
+      return {
+        success: false,
+        message: `Database reset failed: ${error.message}`
+      };
+    }
+  }
+
   // Test connectivity
   async testConnections(): Promise<{ 
     postgres: boolean; 
@@ -355,48 +391,58 @@ export class DatabaseService {
       logs: number; 
     } 
   }> {
+    let postgresConnected = false;
+    let mongodbConnected = false;
+    let userCount = 0, productCount = 0, categoryCount = 0, orderCount = 0, orderItemCount = 0;
+    let reviewCount = 0, logCount = 0;
+
     try {
-      // Test PostgreSQL
-      const userCount = await this.userRepository.count();
-      const productCount = await this.productRepository.count();
-      const categoryCount = await this.categoryRepository.count();
-      const orderCount = await this.orderRepository.count();
-      const orderItemCount = await this.orderItemRepository.count();
-      const postgresConnected = true;
-
-      // Test MongoDB collections
-      const reviewCount = await this.reviewModel.countDocuments();
-      const logCount = await this.logModel.countDocuments();
-      const mongodbConnected = true;
-
-      return {
-        postgres: postgresConnected,
-        mongodb: mongodbConnected,
-        collections: {
-          users: userCount,
-          products: productCount,
-          categories: categoryCount,
-          orders: orderCount,
-          orderItems: orderItemCount,
-          reviews: reviewCount,
-          logs: logCount,
-        },
-      };
-    } catch (error) {
-      console.error('Database connection test failed:', error);
-      return {
-        postgres: false,
-        mongodb: false,
-        collections: {
-          users: 0,
-          products: 0,
-          categories: 0,
-          orders: 0,
-          orderItems: 0,
-          reviews: 0,
-          logs: 0,
-        },
-      };
+      // Test PostgreSQL basic connection first
+      await this.userRepository.count();
+      await this.productRepository.count();
+      await this.categoryRepository.count();
+      
+      userCount = await this.userRepository.count();
+      productCount = await this.productRepository.count();
+      categoryCount = await this.categoryRepository.count();
+      postgresConnected = true;
+      
+      // Try order tables but handle potential schema issues
+      try {
+        orderCount = await this.orderRepository.count();
+        orderItemCount = await this.orderItemRepository.count();
+      } catch (orderError) {
+        console.warn('Order tables have schema issues, but basic PostgreSQL connection works:', orderError.message);
+        orderCount = 0;
+        orderItemCount = 0;
+      }
+    } catch (pgError) {
+      console.error('PostgreSQL connection failed:', pgError);
+      postgresConnected = false;
     }
+
+    try {
+      // Test MongoDB collections
+      reviewCount = await this.reviewModel.countDocuments();
+      logCount = await this.logModel.countDocuments();
+      mongodbConnected = true;
+    } catch (mongoError) {
+      console.error('MongoDB connection failed:', mongoError);
+      mongodbConnected = false;
+    }
+
+    return {
+      postgres: postgresConnected,
+      mongodb: mongodbConnected,
+      collections: {
+        users: userCount,
+        products: productCount,
+        categories: categoryCount,
+        orders: orderCount,
+        orderItems: orderItemCount,
+        reviews: reviewCount,
+        logs: logCount,
+      },
+    };
   }
 }

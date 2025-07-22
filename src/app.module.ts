@@ -43,10 +43,18 @@ import {
         password: configService.get('DB_PASS'),
         database: configService.get('DB_NAME'),
         ssl: configService.get('DB_SSL') === 'true',
-        synchronize: configService.get('DB_SYNC') === 'true',
-        logging: configService.get('DB_LOGGING') === 'true',
+        synchronize: configService.get('DB_SYNC') !== 'false', // Allow disabling sync via env var
+        logging: false, // Disable logging in production
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         autoLoadEntities: true,
+        retryAttempts: 3,
+        retryDelay: 3000,
+        extra: {
+          // Add connection pool settings for better reliability
+          max: 10,
+          idleTimeoutMillis: 30000,
+          connectionTimeoutMillis: 5000,
+        },
       }),
       inject: [ConfigService],
     }),

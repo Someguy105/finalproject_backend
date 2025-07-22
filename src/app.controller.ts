@@ -17,9 +17,33 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  @Get('favicon.ico')
+  getFavicon(): void {
+    // Return empty response for favicon requests to prevent 404 errors
+    return;
+  }
+
   @Get('health/db')
   async testDatabaseConnections() {
     return await this.databaseService.testConnections();
+  }
+
+  @Post('admin/reset-database')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async resetDatabase(@CurrentUser() user: JwtPayload) {
+    console.log(`Database reset requested by admin user: ${user.email}`);
+    return await this.databaseService.resetDatabase();
+  }
+
+  @Post('dev/reset-database')
+  async resetDatabaseDev() {
+    // Only allow in development/testing environments
+    if (process.env.NODE_ENV === 'production') {
+      return { success: false, message: 'Database reset not allowed in production' };
+    }
+    console.log('Development database reset requested');
+    return await this.databaseService.resetDatabase();
   }
 
   @Get('users')
