@@ -167,6 +167,7 @@ export class SeedDataService {
     const orderData = [
       {
         user: customers[0],
+        orderNumber: 'ORD-2025-001',
         subtotal: 2599.98,
         taxAmount: 199.99,
         shippingAmount: 0,
@@ -186,6 +187,7 @@ export class SeedDataService {
       },
       {
         user: customers[1] || customers[0],
+        orderNumber: 'ORD-2025-002',
         subtotal: 189.99,
         taxAmount: 15.20,
         shippingAmount: 9.99,
@@ -205,6 +207,7 @@ export class SeedDataService {
       },
       {
         user: customers[0],
+        orderNumber: 'ORD-2025-003',
         subtotal: 49.99,
         taxAmount: 4.00,
         shippingAmount: 5.99,
@@ -224,6 +227,7 @@ export class SeedDataService {
       },
       {
         user: customers[1] || customers[0],
+        orderNumber: 'ORD-2025-004',
         subtotal: 299.99,
         taxAmount: 24.00,
         shippingAmount: 0,
