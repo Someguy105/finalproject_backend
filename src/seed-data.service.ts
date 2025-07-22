@@ -121,8 +121,8 @@ export class SeedDataService {
         price: 2499.99,
         stock: 25,
         category: categories[0], // Electronics
-        imageUrl: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500',
-        featured: true
+        images: ['https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500'],
+        metadata: { featured: true }
       },
       {
         name: 'Premium Wireless Headphones',
@@ -130,8 +130,8 @@ export class SeedDataService {
         price: 299.99,
         stock: 50,
         category: categories[0], // Electronics
-        imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500',
-        featured: false
+        images: ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500'],
+        metadata: { featured: false }
       },
       {
         name: 'Designer Winter Jacket',
@@ -139,8 +139,8 @@ export class SeedDataService {
         price: 189.99,
         stock: 30,
         category: categories[1], // Clothing
-        imageUrl: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500',
-        featured: true
+        images: ['https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500'],
+        metadata: { featured: true }
       },
       {
         name: 'Programming Complete Guide',
@@ -148,8 +148,8 @@ export class SeedDataService {
         price: 49.99,
         stock: 100,
         category: categories[2], // Books
-        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500',
-        featured: false
+        images: ['https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500'],
+        metadata: { featured: false }
       }
     ];
 
