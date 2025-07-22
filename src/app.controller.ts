@@ -46,6 +46,20 @@ export class AppController {
     return await this.databaseService.resetDatabase();
   }
 
+  @Post('dev/seed-users')
+  async seedDefaultUsers() {
+    console.log('Seeding default users...');
+    return await this.databaseService.seedDefaultUsers();
+  }
+
+  @Post('admin/seed-users')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async seedDefaultUsersAdmin(@CurrentUser() user: JwtPayload) {
+    console.log(`Seed users requested by admin user: ${user.email}`);
+    return await this.databaseService.seedDefaultUsers();
+  }
+
   @Get('users')
   async getUsers() {
     return await this.databaseService.findAllUsers();

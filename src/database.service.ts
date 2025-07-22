@@ -8,6 +8,7 @@ import { Product } from './entities/product.entity';
 import { Category } from './entities/category.entity';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
+import { Role } from './common/enums/role.enum';
 import { Review, ReviewDocument } from './schemas/review.schema';
 import { Log, LogDocument, LogLevel, LogCategory } from './schemas/log.schema';
 
@@ -443,6 +444,65 @@ export class DatabaseService {
         reviews: reviewCount,
         logs: logCount,
       },
+    };
+  }
+
+  // Seed default users for testing
+  async seedDefaultUsers(): Promise<{ message: string; users: Partial<User>[] }> {
+    const defaultUsers = [
+      {
+        email: 'admin@test.com',
+        password: 'admin123',
+        firstName: 'Admin',
+        lastName: 'User',
+        role: Role.ADMIN,
+      },
+      {
+        email: 'customer@test.com',
+        password: 'customer123',
+        firstName: 'Test',
+        lastName: 'Customer',
+        role: Role.CUSTOMER,
+      },
+    ];
+
+    const createdUsers: Partial<User>[] = [];
+
+    for (const userData of defaultUsers) {
+      try {
+        // Check if user already exists
+        const existingUser = await this.findUserByEmail(userData.email);
+        
+        if (!existingUser) {
+          // Hash password
+          const bcrypt = require('bcrypt');
+          const saltRounds = 10;
+          const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+
+          // Create user
+          const user = this.userRepository.create({
+            ...userData,
+            password: hashedPassword,
+          });
+
+          const savedUser = await this.userRepository.save(user);
+          
+          // Remove password from response
+          const { password, ...userResponse } = savedUser;
+          createdUsers.push(userResponse);
+        } else {
+          // User already exists, add to response without password
+          const { password, ...userResponse } = existingUser;
+          createdUsers.push(userResponse);
+        }
+      } catch (error) {
+        console.error(`Error creating user ${userData.email}:`, error);
+      }
+    }
+
+    return {
+      message: 'Default users seeded successfully',
+      users: createdUsers,
     };
   }
 }
