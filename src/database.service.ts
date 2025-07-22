@@ -530,7 +530,23 @@ export class DatabaseService {
         }
       }
 
-      // 2. Drop all sequences
+      // 2. Drop all enum types
+      const enumsToDrop = [
+        'role_enum',
+        'order_status_enum',
+        'payment_status_enum'
+      ];
+
+      for (const enumType of enumsToDrop) {
+        try {
+          await this.userRepository.query(`DROP TYPE IF EXISTS "${enumType}" CASCADE`);
+          console.log(`Dropped enum type: ${enumType}`);
+        } catch (enumError) {
+          console.warn(`Could not drop enum ${enumType}:`, enumError.message);
+        }
+      }
+
+      // 3. Drop all sequences
       const sequencesToDrop = [
         'app_users_id_seq',
         'categories_id_seq', 
@@ -548,7 +564,7 @@ export class DatabaseService {
         }
       }
 
-      // 3. Drop all MongoDB collections
+      // 4. Drop all MongoDB collections
       try {
         // Drop specific collections we know about
         await this.reviewModel.collection.drop();
@@ -560,7 +576,7 @@ export class DatabaseService {
         console.warn('Could not drop some MongoDB collections (they may not exist):', mongoError.message);
       }
 
-      // 4. Clear any remaining indexes
+      // 5. Clear any remaining indexes
       try {
         await this.reviewModel.collection.dropIndexes();
         await this.logModel.collection.dropIndexes();
@@ -570,12 +586,12 @@ export class DatabaseService {
       }
 
       console.log('HARD database reset completed successfully');
-      console.log('⚠️  All tables, sequences, and collections have been PERMANENTLY DELETED!');
-      console.log('🔄 TypeORM will recreate tables with fresh schema on next application restart.');
+      console.log('⚠️  All tables, sequences, enum types, and collections have been PERMANENTLY DELETED!');
+      console.log('🔄 Use recreate-schema endpoint to recreate tables with proper structure.');
       
       return {
         success: true,
-        message: 'HARD database reset completed! All PostgreSQL tables, sequences, and MongoDB collections permanently deleted. Application restart required to recreate schema.'
+        message: 'HARD database reset completed! All PostgreSQL tables, sequences, enum types, and MongoDB collections permanently deleted. Use recreate-schema to rebuild.'
       };
     } catch (error) {
       console.error('Hard database reset failed:', error);
@@ -660,8 +676,36 @@ export class DatabaseService {
     try {
       console.log('Starting manual schema recreation...');
       
+      // First, create enum types that match the entities
+      await this.userRepository.query(`
+        DO $$ BEGIN
+          CREATE TYPE "role_enum" AS ENUM ('admin', 'customer');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `);
+      console.log('Created role_enum type');
+
+      await this.orderRepository.query(`
+        DO $$ BEGIN
+          CREATE TYPE "order_status_enum" AS ENUM ('pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `);
+      console.log('Created order_status_enum type');
+
+      await this.orderRepository.query(`
+        DO $$ BEGIN
+          CREATE TYPE "payment_status_enum" AS ENUM ('pending', 'processing', 'completed', 'failed', 'refunded');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `);
+      console.log('Created payment_status_enum type');
+      
       // Create tables manually using raw SQL matching the exact entity definitions
-      // 1. Create users table (app_users)
+      // 1. Create users table (app_users) - matches User entity
       await this.userRepository.query(`
         CREATE TABLE IF NOT EXISTS "app_users" (
           "id" SERIAL PRIMARY KEY,
@@ -669,7 +713,7 @@ export class DatabaseService {
           "password" VARCHAR NOT NULL,
           "firstName" VARCHAR NOT NULL,
           "lastName" VARCHAR NOT NULL,
-          "role" VARCHAR NOT NULL DEFAULT 'customer',
+          "role" "role_enum" NOT NULL DEFAULT 'customer',
           "isActive" BOOLEAN NOT NULL DEFAULT true,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
@@ -677,7 +721,7 @@ export class DatabaseService {
       `);
       console.log('Created app_users table');
 
-      // 2. Create categories table
+      // 2. Create categories table - matches Category entity
       await this.categoryRepository.query(`
         CREATE TABLE IF NOT EXISTS "categories" (
           "id" SERIAL PRIMARY KEY,
@@ -694,7 +738,7 @@ export class DatabaseService {
       `);
       console.log('Created categories table');
 
-      // 3. Create products table (app_products)
+      // 3. Create products table (app_products) - matches Product entity
       await this.productRepository.query(`
         CREATE TABLE IF NOT EXISTS "app_products" (
           "id" SERIAL PRIMARY KEY,
@@ -713,14 +757,14 @@ export class DatabaseService {
       `);
       console.log('Created app_products table');
 
-      // 4. Create orders table
+      // 4. Create orders table - matches Order entity
       await this.orderRepository.query(`
         CREATE TABLE IF NOT EXISTS "orders" (
           "id" SERIAL PRIMARY KEY,
           "userId" INTEGER NOT NULL,
           "orderNumber" VARCHAR UNIQUE NOT NULL,
-          "status" VARCHAR NOT NULL DEFAULT 'pending',
-          "paymentStatus" VARCHAR NOT NULL DEFAULT 'pending',
+          "status" "order_status_enum" NOT NULL DEFAULT 'pending',
+          "paymentStatus" "payment_status_enum" NOT NULL DEFAULT 'pending',
           "subtotal" DECIMAL(10,2) NOT NULL,
           "taxAmount" DECIMAL(10,2) DEFAULT 0,
           "shippingAmount" DECIMAL(10,2) DEFAULT 0,
@@ -741,7 +785,7 @@ export class DatabaseService {
       `);
       console.log('Created orders table');
 
-      // 5. Create order_items table
+      // 5. Create order_items table - matches OrderItem entity
       await this.orderItemRepository.query(`
         CREATE TABLE IF NOT EXISTS "order_items" (
           "id" SERIAL PRIMARY KEY,
@@ -761,7 +805,7 @@ export class DatabaseService {
       
       return {
         success: true,
-        message: 'Database schema recreated successfully. All tables are now available for use.'
+        message: 'Database schema recreated successfully with proper enum types. All tables match entity definitions exactly.'
       };
     } catch (error) {
       console.error('Schema recreation failed:', error);
