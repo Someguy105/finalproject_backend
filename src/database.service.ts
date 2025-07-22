@@ -456,8 +456,8 @@ export class DatabaseService {
       await this.orderRepository.query('DELETE FROM "orders"');
       console.log('Cleared orders table');
       
-      await this.productRepository.query('DELETE FROM "products"');
-      console.log('Cleared products table');
+      await this.productRepository.query('DELETE FROM "app_products"');  // Changed to app_products
+      console.log('Cleared app_products table');
       
       await this.categoryRepository.query('DELETE FROM "categories"');
       console.log('Cleared categories table');
@@ -476,7 +476,7 @@ export class DatabaseService {
       try {
         await this.userRepository.query('ALTER SEQUENCE "app_users_id_seq" RESTART WITH 1');
         await this.categoryRepository.query('ALTER SEQUENCE "categories_id_seq" RESTART WITH 1');
-        await this.productRepository.query('ALTER SEQUENCE "products_id_seq" RESTART WITH 1');
+        await this.productRepository.query('ALTER SEQUENCE "app_products_id_seq" RESTART WITH 1');  // Changed sequence name
         await this.orderRepository.query('ALTER SEQUENCE "orders_id_seq" RESTART WITH 1');
         await this.orderItemRepository.query('ALTER SEQUENCE "order_items_id_seq" RESTART WITH 1');
         console.log('Reset all sequences successfully');
@@ -508,7 +508,7 @@ export class DatabaseService {
       const tablesToDrop = [
         'order_items',
         'orders', 
-        'products',
+        'app_products',  // Changed from 'products' to 'app_products'
         'categories',
         'app_users',
         'discount_categories', // Legacy table
@@ -529,7 +529,7 @@ export class DatabaseService {
       const sequencesToDrop = [
         'app_users_id_seq',
         'categories_id_seq', 
-        'products_id_seq',
+        'app_products_id_seq',  // Changed from 'products_id_seq' to 'app_products_id_seq'
         'orders_id_seq',
         'order_items_id_seq'
       ];
@@ -655,8 +655,8 @@ export class DatabaseService {
     try {
       console.log('Starting manual schema recreation...');
       
-      // Create tables manually using raw SQL
-      // 1. Create users table
+      // Create tables manually using raw SQL matching the exact entity definitions
+      // 1. Create users table (app_users)
       await this.userRepository.query(`
         CREATE TABLE IF NOT EXISTS "app_users" (
           "id" SERIAL PRIMARY KEY,
@@ -676,43 +676,59 @@ export class DatabaseService {
       await this.categoryRepository.query(`
         CREATE TABLE IF NOT EXISTS "categories" (
           "id" SERIAL PRIMARY KEY,
-          "name" VARCHAR NOT NULL,
+          "name" VARCHAR UNIQUE NOT NULL,
           "description" TEXT,
-          "sortOrder" INTEGER DEFAULT 0,
+          "slug" VARCHAR,
+          "image" VARCHAR,
           "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "sortOrder" INTEGER DEFAULT 0,
+          "metadata" JSONB,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW()
         )
       `);
       console.log('Created categories table');
 
-      // 3. Create products table
+      // 3. Create products table (app_products)
       await this.productRepository.query(`
-        CREATE TABLE IF NOT EXISTS "products" (
+        CREATE TABLE IF NOT EXISTS "app_products" (
           "id" SERIAL PRIMARY KEY,
           "name" VARCHAR NOT NULL,
-          "description" TEXT,
+          "description" TEXT NOT NULL,
           "price" DECIMAL(10,2) NOT NULL,
-          "stock" INTEGER NOT NULL DEFAULT 0,
-          "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "stock" INTEGER NOT NULL,
+          "images" TEXT[] DEFAULT '{}',
           "categoryId" INTEGER,
-          "imageUrl" VARCHAR,
+          "isAvailable" BOOLEAN NOT NULL DEFAULT true,
+          "metadata" JSONB,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE SET NULL
         )
       `);
-      console.log('Created products table');
+      console.log('Created app_products table');
 
       // 4. Create orders table
       await this.orderRepository.query(`
         CREATE TABLE IF NOT EXISTS "orders" (
           "id" SERIAL PRIMARY KEY,
           "userId" INTEGER NOT NULL,
+          "orderNumber" VARCHAR UNIQUE NOT NULL,
           "status" VARCHAR NOT NULL DEFAULT 'pending',
-          "total" DECIMAL(10,2) NOT NULL,
-          "shippingAddress" TEXT,
-          "billingAddress" TEXT,
+          "paymentStatus" VARCHAR NOT NULL DEFAULT 'pending',
+          "subtotal" DECIMAL(10,2) NOT NULL,
+          "taxAmount" DECIMAL(10,2) DEFAULT 0,
+          "shippingAmount" DECIMAL(10,2) DEFAULT 0,
+          "discountAmount" DECIMAL(10,2) DEFAULT 0,
+          "totalAmount" DECIMAL(10,2) NOT NULL,
+          "currency" VARCHAR,
+          "shippingAddress" JSONB,
+          "billingAddress" JSONB,
+          "paymentMethod" VARCHAR,
+          "paymentReference" VARCHAR,
+          "trackingNumber" VARCHAR,
+          "notes" TEXT,
+          "metadata" JSONB,
           "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
           FOREIGN KEY ("userId") REFERENCES "app_users"("id") ON DELETE CASCADE
@@ -727,11 +743,11 @@ export class DatabaseService {
           "orderId" INTEGER NOT NULL,
           "productId" INTEGER NOT NULL,
           "quantity" INTEGER NOT NULL,
-          "price" DECIMAL(10,2) NOT NULL,
-          "createdAt" TIMESTAMP NOT NULL DEFAULT NOW(),
-          "updatedAt" TIMESTAMP NOT NULL DEFAULT NOW(),
+          "unitPrice" DECIMAL(10,2) NOT NULL,
+          "totalPrice" DECIMAL(10,2) NOT NULL,
+          "productSnapshot" JSONB,
           FOREIGN KEY ("orderId") REFERENCES "orders"("id") ON DELETE CASCADE,
-          FOREIGN KEY ("productId") REFERENCES "products"("id") ON DELETE CASCADE
+          FOREIGN KEY ("productId") REFERENCES "app_products"("id") ON DELETE CASCADE
         )
       `);
       console.log('Created order_items table');
