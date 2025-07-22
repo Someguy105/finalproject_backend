@@ -9,7 +9,7 @@ export class CategoriesController {
   @Get()
   async findAll() {
     try {
-      const categories = await this.databaseService.findAllCategories();
+      const categories = await this.databaseService.findAllCategoriesSimple();
       return {
         success: true,
         statusCode: 200,

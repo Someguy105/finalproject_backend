@@ -118,6 +118,11 @@ export class DatabaseService {
     }
   }
 
+  async findAllCategoriesSimple(): Promise<Category[]> {
+    // Simple query without any relations or complex ordering
+    return await this.categoryRepository.find();
+  }
+
   async findCategoryById(id: number): Promise<Category | null> {
     try {
       // Try with relations first
