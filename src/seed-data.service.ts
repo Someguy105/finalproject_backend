@@ -32,32 +32,51 @@ export class SeedDataService {
 
   async seedAllData(): Promise<{ message: string; summary: any }> {
     try {
+      console.log('🌱 Starting seed data process...');
+      
       // Get existing users for relationships
+      console.log('📋 Checking for existing users...');
       const users = await this.userRepository.find();
+      console.log(`👥 Found ${users.length} users`);
+      
       if (users.length === 0) {
         throw new Error('No users found. Please seed users first.');
       }
 
       const admin = users.find(u => u.role === 'admin');
       const customers = users.filter(u => u.role === 'customer');
+      console.log(`🔑 Admin user: ${admin ? 'Found' : 'Not found'}`);
+      console.log(`👤 Customer users: ${customers.length}`);
 
       // 1. Seed Categories
+      console.log('📂 Seeding categories...');
       const categories = await this.seedCategories();
+      console.log(`✅ Categories: ${categories.length}`);
       
       // 2. Seed Products
+      console.log('🛍️ Seeding products...');
       const products = await this.seedProducts(categories);
+      console.log(`✅ Products: ${products.length}`);
       
       // 3. Seed Orders
+      console.log('🛒 Seeding orders...');
       const orders = await this.seedOrders(customers);
+      console.log(`✅ Orders: ${orders.length}`);
       
       // 4. Seed Order Items
+      console.log('📦 Seeding order items...');
       const orderItems = await this.seedOrderItems(orders, products);
+      console.log(`✅ Order Items: ${orderItems.length}`);
       
       // 5. Seed Reviews
+      console.log('⭐ Seeding reviews...');
       const reviews = await this.seedReviews(customers, products);
+      console.log(`✅ Reviews: ${reviews.length}`);
       
       // 6. Seed Logs
+      console.log('📋 Seeding logs...');
       const logs = await this.seedLogs(admin || users[0]);
+      console.log(`✅ Logs: ${logs.length}`);
 
       const summary = {
         categories: categories.length,
@@ -68,11 +87,14 @@ export class SeedDataService {
         logs: logs.length,
       };
 
+      console.log('🎉 Seed data completed successfully!', summary);
       return {
         message: 'All seed data created successfully',
         summary,
       };
     } catch (error) {
+      console.error('❌ Seed data failed:', error.message);
+      console.error('Stack trace:', error.stack);
       throw new Error(`Failed to seed data: ${error.message}`);
     }
   }
@@ -264,34 +286,39 @@ export class SeedDataService {
         order: orders[0],
         product: products[0], // Gaming Laptop
         quantity: 1,
-        price: 2499.99
+        unitPrice: 2499.99,
+        totalPrice: 2499.99
       },
       {
         order: orders[0],
         product: products[1], // Headphones
         quantity: 1,
-        price: 299.99
+        unitPrice: 299.99,
+        totalPrice: 299.99
       },
       // Order 2: Winter Jacket
       {
         order: orders[1],
         product: products[2], // Winter Jacket
         quantity: 1,
-        price: 189.99
+        unitPrice: 189.99,
+        totalPrice: 189.99
       },
       // Order 3: Programming Book
       {
         order: orders[2],
         product: products[3], // Book
         quantity: 1,
-        price: 49.99
+        unitPrice: 49.99,
+        totalPrice: 49.99
       },
       // Order 4: Headphones
       {
         order: orders[3],
         product: products[1], // Headphones
         quantity: 1,
-        price: 299.99
+        unitPrice: 299.99,
+        totalPrice: 299.99
       }
     ];
 
