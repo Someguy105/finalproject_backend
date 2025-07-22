@@ -400,6 +400,88 @@ export class DatabaseService {
     }
   }
 
+  // Hard reset functionality - Drops and recreates everything
+  async hardResetDatabase(): Promise<{ success: boolean; message: string }> {
+    try {
+      console.log('Starting HARD database reset - This will drop all tables and collections!');
+      
+      // 1. Drop all PostgreSQL tables with CASCADE to handle dependencies
+      const tablesToDrop = [
+        'order_items',
+        'orders', 
+        'products',
+        'categories',
+        'app_users',
+        'discount_categories', // Legacy table
+        'discounts', // Legacy table
+        'migrations' // TypeORM migrations
+      ];
+
+      for (const table of tablesToDrop) {
+        try {
+          await this.userRepository.query(`DROP TABLE IF EXISTS "${table}" CASCADE`);
+          console.log(`Dropped table: ${table}`);
+        } catch (dropError) {
+          console.warn(`Could not drop table ${table}:`, dropError.message);
+        }
+      }
+
+      // 2. Drop all sequences
+      const sequencesToDrop = [
+        'app_users_id_seq',
+        'categories_id_seq', 
+        'products_id_seq',
+        'orders_id_seq',
+        'order_items_id_seq'
+      ];
+
+      for (const sequence of sequencesToDrop) {
+        try {
+          await this.userRepository.query(`DROP SEQUENCE IF EXISTS "${sequence}" CASCADE`);
+          console.log(`Dropped sequence: ${sequence}`);
+        } catch (seqError) {
+          console.warn(`Could not drop sequence ${sequence}:`, seqError.message);
+        }
+      }
+
+      // 3. Drop all MongoDB collections
+      try {
+        // Drop specific collections we know about
+        await this.reviewModel.collection.drop();
+        console.log('Dropped MongoDB collection: reviews');
+        
+        await this.logModel.collection.drop();
+        console.log('Dropped MongoDB collection: logs');
+      } catch (mongoError) {
+        console.warn('Could not drop some MongoDB collections (they may not exist):', mongoError.message);
+      }
+
+      // 4. Clear any remaining indexes
+      try {
+        await this.reviewModel.collection.dropIndexes();
+        await this.logModel.collection.dropIndexes();
+        console.log('Dropped MongoDB indexes');
+      } catch (indexError) {
+        console.warn('Could not drop indexes:', indexError.message);
+      }
+
+      console.log('HARD database reset completed successfully');
+      console.log('⚠️  All tables, sequences, and collections have been PERMANENTLY DELETED!');
+      console.log('🔄 TypeORM will recreate tables with fresh schema on next application restart.');
+      
+      return {
+        success: true,
+        message: 'HARD database reset completed! All PostgreSQL tables, sequences, and MongoDB collections permanently deleted. Application restart required to recreate schema.'
+      };
+    } catch (error) {
+      console.error('Hard database reset failed:', error);
+      return {
+        success: false,
+        message: `Hard database reset failed: ${error.message}`
+      };
+    }
+  }
+
   // Test connectivity
   async testConnections(): Promise<{ 
     postgres: boolean; 

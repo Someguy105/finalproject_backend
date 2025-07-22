@@ -46,6 +46,24 @@ export class AppController {
     return await this.databaseService.resetDatabase();
   }
 
+  @Post('dev/hard-reset-database')
+  async hardResetDatabaseDev() {
+    // Only allow in development/testing environments
+    if (process.env.NODE_ENV === 'production') {
+      return { success: false, message: 'Hard database reset not allowed in production' };
+    }
+    console.log('Development HARD database reset requested - This will DROP ALL TABLES!');
+    return await this.databaseService.hardResetDatabase();
+  }
+
+  @Post('admin/hard-reset-database')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  async hardResetDatabase(@CurrentUser() user: JwtPayload) {
+    console.log(`HARD database reset requested by admin user: ${user.email} - This will DROP ALL TABLES!`);
+    return await this.databaseService.hardResetDatabase();
+  }
+
   @Post('dev/seed-users')
   async seedDefaultUsers() {
     console.log('Seeding default users...');
