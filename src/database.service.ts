@@ -103,17 +103,35 @@ export class DatabaseService {
   }
 
   async findAllCategories(): Promise<Category[]> {
-    return await this.categoryRepository.find({
-      relations: ['products'],
-      order: { sortOrder: 'ASC', name: 'ASC' }
-    });
+    try {
+      // Try with relations first
+      return await this.categoryRepository.find({
+        relations: ['products'],
+        order: { sortOrder: 'ASC', name: 'ASC' }
+      });
+    } catch (relationError) {
+      console.warn('Could not load categories with product relations, loading without relations:', relationError.message);
+      // Fallback to basic query without relations
+      return await this.categoryRepository.find({
+        order: { sortOrder: 'ASC', name: 'ASC' }
+      });
+    }
   }
 
   async findCategoryById(id: number): Promise<Category | null> {
-    return await this.categoryRepository.findOne({ 
-      where: { id },
-      relations: ['products']
-    });
+    try {
+      // Try with relations first
+      return await this.categoryRepository.findOne({ 
+        where: { id },
+        relations: ['products']
+      });
+    } catch (relationError) {
+      console.warn('Could not load category with product relations, loading without relations:', relationError.message);
+      // Fallback to basic query without relations
+      return await this.categoryRepository.findOne({ 
+        where: { id }
+      });
+    }
   }
 
   async updateCategory(id: number, categoryData: Partial<Category>): Promise<Category | null> {
@@ -133,25 +151,81 @@ export class DatabaseService {
   }
 
   async findAllOrders(): Promise<Order[]> {
-    return await this.orderRepository.find({
-      relations: ['user', 'orderItems', 'orderItems.product'],
-      order: { createdAt: 'DESC' }
-    });
+    try {
+      // Try with full relations first
+      return await this.orderRepository.find({
+        relations: ['user', 'orderItems', 'orderItems.product'],
+        order: { createdAt: 'DESC' }
+      });
+    } catch (relationError) {
+      console.warn('Could not load orders with full relations, trying basic relations:', relationError.message);
+      try {
+        // Try with just user relation
+        return await this.orderRepository.find({
+          relations: ['user'],
+          order: { createdAt: 'DESC' }
+        });
+      } catch (basicError) {
+        console.warn('Could not load orders with any relations, loading without relations:', basicError.message);
+        // Fallback to no relations
+        return await this.orderRepository.find({
+          order: { createdAt: 'DESC' }
+        });
+      }
+    }
   }
 
   async findOrderById(id: number): Promise<Order | null> {
-    return await this.orderRepository.findOne({ 
-      where: { id },
-      relations: ['user', 'orderItems', 'orderItems.product']
-    });
+    try {
+      // Try with full relations first
+      return await this.orderRepository.findOne({ 
+        where: { id },
+        relations: ['user', 'orderItems', 'orderItems.product']
+      });
+    } catch (relationError) {
+      console.warn('Could not load order with full relations, trying basic relations:', relationError.message);
+      try {
+        // Try with just user relation
+        return await this.orderRepository.findOne({ 
+          where: { id },
+          relations: ['user']
+        });
+      } catch (basicError) {
+        console.warn('Could not load order with any relations, loading without relations:', basicError.message);
+        // Fallback to no relations
+        return await this.orderRepository.findOne({ 
+          where: { id }
+        });
+      }
+    }
   }
 
   async findOrdersByUser(userId: number): Promise<Order[]> {
-    return await this.orderRepository.find({
-      where: { userId },
-      relations: ['user', 'orderItems', 'orderItems.product'],
-      order: { createdAt: 'DESC' }
-    });
+    try {
+      // Try with full relations first
+      return await this.orderRepository.find({
+        where: { userId },
+        relations: ['user', 'orderItems', 'orderItems.product'],
+        order: { createdAt: 'DESC' }
+      });
+    } catch (relationError) {
+      console.warn('Could not load user orders with full relations, trying basic relations:', relationError.message);
+      try {
+        // Try with just user relation
+        return await this.orderRepository.find({
+          where: { userId },
+          relations: ['user'],
+          order: { createdAt: 'DESC' }
+        });
+      } catch (basicError) {
+        console.warn('Could not load user orders with any relations, loading without relations:', basicError.message);
+        // Fallback to no relations
+        return await this.orderRepository.find({
+          where: { userId },
+          order: { createdAt: 'DESC' }
+        });
+      }
+    }
   }
 
   async updateOrder(id: number, orderData: Partial<Order>): Promise<Order | null> {
@@ -171,23 +245,48 @@ export class DatabaseService {
   }
 
   async findAllOrderItems(): Promise<OrderItem[]> {
-    return await this.orderItemRepository.find({
-      relations: ['product', 'order']
-    });
+    try {
+      // Try with relations first
+      return await this.orderItemRepository.find({
+        relations: ['product', 'order']
+      });
+    } catch (relationError) {
+      console.warn('Could not load order items with relations, loading without relations:', relationError.message);
+      // Fallback to no relations
+      return await this.orderItemRepository.find();
+    }
   }
 
   async findOrderItemsByOrder(orderId: number): Promise<OrderItem[]> {
-    return await this.orderItemRepository.find({
-      where: { orderId },
-      relations: ['product']
-    });
+    try {
+      // Try with relations first
+      return await this.orderItemRepository.find({
+        where: { orderId },
+        relations: ['product']
+      });
+    } catch (relationError) {
+      console.warn('Could not load order items with relations, loading without relations:', relationError.message);
+      // Fallback to no relations
+      return await this.orderItemRepository.find({
+        where: { orderId }
+      });
+    }
   }
 
   async findOrderItemById(id: number): Promise<OrderItem | null> {
-    return await this.orderItemRepository.findOne({ 
-      where: { id },
-      relations: ['product', 'order']
-    });
+    try {
+      // Try with relations first
+      return await this.orderItemRepository.findOne({ 
+        where: { id },
+        relations: ['product', 'order']
+      });
+    } catch (relationError) {
+      console.warn('Could not load order item with relations, loading without relations:', relationError.message);
+      // Fallback to no relations
+      return await this.orderItemRepository.findOne({ 
+        where: { id }
+      });
+    }
   }
 
   async updateOrderItem(id: number, orderItemData: Partial<OrderItem>): Promise<OrderItem | null> {
