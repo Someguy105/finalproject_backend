@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { CategoriesController } from './categories.controller';
 import { DatabaseService } from './database.service';
 import { User } from './entities/user.entity';
 import { Product } from './entities/product.entity';
@@ -105,7 +106,7 @@ import {
     // Auth Module
     AuthModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, CategoriesController],
   providers: [
     AppService, 
     DatabaseService,
