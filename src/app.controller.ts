@@ -182,6 +182,12 @@ export class AppController {
   }
 
   // Order endpoints (PostgreSQL)
+  @Get('orders/my-orders')
+  @UseGuards(JwtAuthGuard)
+  async getMyOrders(@CurrentUser() user: JwtPayload) {
+    return await this.databaseService.findOrdersByUser(user.sub);
+  }
+
   @Get('orders')
   async getOrders() {
     return await this.databaseService.findAllOrders();

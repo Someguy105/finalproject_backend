@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { DatabaseService } from '../database.service';
@@ -15,10 +16,21 @@ import { Log, LogSchema } from '../schemas/log.schema';
 
 @Module({
   imports: [
-    JwtModule.register({
+    JwtModule.registerAsync({
       global: true,
-      secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '1h' },
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('JWT_SECRET');
+        console.log('JWT_SECRET loaded:', secret ? 'YES' : 'NO');
+        if (!secret) {
+          throw new Error('JWT_SECRET is not configured');
+        }
+        return {
+          secret: secret,
+          signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '1h' },
+        };
+      },
+      inject: [ConfigService],
     }),
     TypeOrmModule.forFeature([User, Product, Category, Order, OrderItem]),
     MongooseModule.forFeature([
