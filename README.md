@@ -1,60 +1,60 @@
-# Blog & E-commerce Backend API
+# API Backend Blog & E-commerce
 
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
 <p align="center">
-  A comprehensive NestJS backend API for a blog and e-commerce platform with dual database architecture (PostgreSQL + MongoDB).
+  Una API backend integral de NestJS para una plataforma de blog y e-commerce con arquitectura de base de datos dual (PostgreSQL + MongoDB).
 </p>
 
 <p align="center">
-  <a href="https://ecommerce-blog-backend.onrender.com" target="_blank">🚀 Live API</a> |
-  <a href="#api-documentation">📚 API Docs</a> |
-  <a href="#database-models">🗄️ Database Models</a>
+  <a href="https://ecommerce-blog-backend.onrender.com" target="_blank">🚀 API en Vivo</a> |
+  <a href="#documentación-api">📚 Documentación API</a> |
+  <a href="#modelos-de-base-de-datos">🗄️ Modelos de BD</a>
 </p>
 
-## 🏗️ Architecture Overview
+## 🏗️ Vista General de Arquitectura
 
-This project follows a **modular monolithic architecture** built with NestJS, implementing a **dual database strategy**:
+Este proyecto sigue una **arquitectura monolítica modular** construida con NestJS, implementando una **estrategia de base de datos dual**:
 
-- **PostgreSQL**: Handles relational data (Users, Products, Categories, Orders, OrderItems)
-- **MongoDB**: Manages document-based data (Reviews, Logs, Analytics)
+- **PostgreSQL**: Maneja datos relacionales (Usuarios, Productos, Categorías, Pedidos, ElementosPedido)
+- **MongoDB**: Gestiona datos basados en documentos (Reseñas, Logs, Analíticas)
 
-### 🔧 Core Technologies
+### 🔧 Tecnologías Principales
 
-| Category | Technology | Purpose |
-|----------|------------|---------|
-| **Framework** | NestJS 11.x | Progressive Node.js framework |
-| **Language** | TypeScript | Type-safe development |
-| **Primary DB** | PostgreSQL (Neon) | Relational data & ACID transactions |
-| **Secondary DB** | MongoDB Atlas | Document storage & analytics |
-| **ORM** | TypeORM | PostgreSQL object-relational mapping |
-| **ODM** | Mongoose | MongoDB object document mapping |
-| **Authentication** | JWT + bcrypt | Secure token-based auth |
-| **Validation** | Class Validator | DTO validation & transformation |
-| **Email** | Nodemailer | Transactional emails |
-| **Deployment** | Render | Cloud hosting platform |
+| Categoría | Tecnología | Propósito |
+|-----------|------------|-----------|
+| **Framework** | NestJS 11.x | Framework progresivo de Node.js |
+| **Lenguaje** | TypeScript | Desarrollo con seguridad de tipos |
+| **BD Primaria** | PostgreSQL (Neon) | Datos relacionales y transacciones ACID |
+| **BD Secundaria** | MongoDB Atlas | Almacenamiento de documentos y analíticas |
+| **ORM** | TypeORM | Mapeo objeto-relacional para PostgreSQL |
+| **ODM** | Mongoose | Mapeo objeto-documento para MongoDB |
+| **Autenticación** | JWT + bcrypt | Autenticación segura basada en tokens |
+| **Validación** | Class Validator | Validación y transformación de DTO |
+| **Email** | Nodemailer | Emails transaccionales |
+| **Despliegue** | Render | Plataforma de hosting en la nube |
 
-## 🏛️ System Architecture
+## 🏛️ Arquitectura del Sistema
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Frontend (React)                         │
-│                   Port: 3000                                │
+│                   Puerto: 3000                              │
 └─────────────────────┬───────────────────────────────────────┘
-                      │ HTTP/HTTPS Requests
+                      │ Peticiones HTTP/HTTPS
                       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                 NestJS Backend API                          │
-│                   Port: 3030                                │
+│                 API Backend NestJS                          │
+│                   Puerto: 3030                              │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐│
-│  │ Controllers │ │ Services    │ │    Guards & Filters     ││
+│  │Controladores│ │ Servicios   │ │   Guards y Filtros      ││
 │  │             │ │             │ │                         ││
-│  │ • Auth      │ │ • Business  │ │ • JWT Auth Guard        ││
-│  │ • Products  │ │   Logic     │ │ • Admin Guard           ││
-│  │ • Users     │ │ • Data      │ │ • Exception Filter      ││
-│  │ • Orders    │ │   Access    │ │ • Validation Pipe       ││
+│  │ • Auth      │ │ • Lógica de │ │ • JWT Auth Guard        ││
+│  │ • Products  │ │   Negocio   │ │ • Admin Guard           ││
+│  │ • Users     │ │ • Acceso a  │ │ • Exception Filter      ││
+│  │ • Orders    │ │   Datos     │ │ • Validation Pipe       ││
 │  └─────────────┘ └─────────────┘ └─────────────────────────┘│
 └─────────────┬───────────────┬───────────────────────────────┘
               │               │
@@ -71,63 +71,63 @@ This project follows a **modular monolithic architecture** built with NestJS, im
     └─────────────────┘   └─────────────────┘
 ```
 
-## 📁 Project Structure
+## 📁 Estructura del Proyecto
 
 ```
 src/
-├── 📂 auth/                    # Authentication module
-│   ├── auth.controller.ts      # Login, register, profile endpoints
-│   ├── auth.service.ts         # JWT token management
-│   ├── dto/                    # Data transfer objects
-│   └── interfaces/             # Auth interfaces
-├── 📂 entities/                # TypeORM entities (PostgreSQL)
-│   ├── user.entity.ts          # User table definition
-│   ├── product.entity.ts       # Product table definition
-│   ├── category.entity.ts      # Category table definition
-│   ├── order.entity.ts         # Order table definition
-│   └── order-item.entity.ts    # OrderItem table definition
-├── 📂 schemas/                 # Mongoose schemas (MongoDB)
-│   ├── review.schema.ts        # Product reviews
-│   └── log.schema.ts           # System logs
-├── 📂 common/                  # Shared utilities
-│   ├── decorators/             # Custom decorators
-│   ├── guards/                 # Authentication guards
-│   ├── filters/                # Exception filters
-│   ├── pipes/                  # Validation pipes
-│   └── interceptors/           # Response interceptors
-├── 📄 app.controller.ts        # Main API endpoints
-├── 📄 app.service.ts           # Core business logic
-├── 📄 database.service.ts      # Database connection service
-├── 📄 seed-data.service.ts     # Database seeding service
-└── 📄 main.ts                  # Application bootstrap
+├── 📂 auth/                    # Módulo de autenticación
+│   ├── auth.controller.ts      # Endpoints de login, registro, perfil
+│   ├── auth.service.ts         # Gestión de tokens JWT
+│   ├── dto/                    # Objetos de transferencia de datos
+│   └── interfaces/             # Interfaces de autenticación
+├── 📂 entities/                # Entidades TypeORM (PostgreSQL)
+│   ├── user.entity.ts          # Definición de tabla User
+│   ├── product.entity.ts       # Definición de tabla Product
+│   ├── category.entity.ts      # Definición de tabla Category
+│   ├── order.entity.ts         # Definición de tabla Order
+│   └── order-item.entity.ts    # Definición de tabla OrderItem
+├── 📂 schemas/                 # Esquemas Mongoose (MongoDB)
+│   ├── review.schema.ts        # Reseñas de productos
+│   └── log.schema.ts           # Logs del sistema
+├── 📂 common/                  # Utilidades compartidas
+│   ├── decorators/             # Decoradores personalizados
+│   ├── guards/                 # Guards de autenticación
+│   ├── filters/                # Filtros de excepción
+│   ├── pipes/                  # Pipes de validación
+│   └── interceptors/           # Interceptores de respuesta
+├── 📄 app.controller.ts        # Endpoints principales de la API
+├── 📄 app.service.ts           # Lógica de negocio principal
+├── 📄 database.service.ts      # Servicio de conexión a BD
+├── 📄 seed-data.service.ts     # Servicio de sembrado de BD
+└── 📄 main.ts                  # Bootstrap de la aplicación
 ```
 
-## 🧩 Core Components
+## 🧩 Componentes Principales
 
-### 1. **Controllers** (API Layer)
-- **AuthController**: Handles authentication (login, register, profile)
-- **AppController**: Main CRUD operations for all entities
-- **Health Endpoints**: Database status and connectivity checks
+### 1. **Controladores** (Capa API)
+- **AuthController**: Maneja autenticación (login, registro, perfil)
+- **AppController**: Operaciones CRUD principales para todas las entidades
+- **Endpoints de Salud**: Estado de BD y verificaciones de conectividad
 
-### 2. **Services** (Business Logic Layer)
-- **AuthService**: JWT token generation and validation
-- **DatabaseService**: Multi-database connection management
-- **SeedDataService**: Database initialization and seeding
+### 2. **Servicios** (Capa de Lógica de Negocio)
+- **AuthService**: Generación y validación de tokens JWT
+- **DatabaseService**: Gestión de conexiones multi-base de datos
+- **SeedDataService**: Inicialización y sembrado de base de datos
 
-### 3. **Guards & Middleware**
-- **JwtAuthGuard**: Protects authenticated routes
-- **AdminGuard**: Restricts admin-only operations
-- **ValidationPipe**: DTO validation and transformation
+### 3. **Guards y Middleware**
+- **JwtAuthGuard**: Protege rutas autenticadas
+- **AdminGuard**: Restringe operaciones solo para administradores
+- **ValidationPipe**: Validación y transformación de DTO
 
-### 4. **Database Layer**
-- **TypeORM**: PostgreSQL entity management
-- **Mongoose**: MongoDB document operations
+### 4. **Capa de Base de Datos**
+- **TypeORM**: Gestión de entidades PostgreSQL
+- **Mongoose**: Operaciones de documentos MongoDB
 
-## 🗄️ Database Models
+## 🗄️ Modelos de Base de Datos
 
-### PostgreSQL Entities (Relational Data)
+### Entidades PostgreSQL (Datos Relacionales)
 
-#### **User Entity**
+#### **Entidad User**
 ```typescript
 @Entity('users')
 export class User {
@@ -138,7 +138,7 @@ export class User {
   email: string;
 
   @Column()
-  password: string; // bcrypt hashed
+  password: string; // hasheado con bcrypt
 
   @Column()
   firstName: string;
@@ -160,7 +160,7 @@ export class User {
 }
 ```
 
-#### **Product Entity**
+#### **Entidad Product**
 ```typescript
 @Entity('products')
 export class Product {
@@ -202,7 +202,7 @@ export class Product {
 }
 ```
 
-#### **Category Entity**
+#### **Entidad Category**
 ```typescript
 @Entity('categories')
 export class Category {
@@ -241,7 +241,7 @@ export class Category {
 }
 ```
 
-#### **Order Entity**
+#### **Entidad Order**
 ```typescript
 @Entity('orders')
 export class Order {
@@ -301,7 +301,7 @@ export class Order {
 }
 ```
 
-#### **OrderItem Entity**
+#### **Entidad OrderItem**
 ```typescript
 @Entity('order_items')
 export class OrderItem {
@@ -330,13 +330,13 @@ export class OrderItem {
   totalPrice: string;
 
   @Column('json', { nullable: true })
-  productSnapshot: any; // Product details at time of purchase
+  productSnapshot: any; // Detalles del producto al momento de la compra
 }
 ```
 
-### MongoDB Schemas (Document Data)
+### Esquemas MongoDB (Datos de Documentos)
 
-#### **Review Schema**
+#### **Esquema Review**
 ```typescript
 @Schema({ timestamps: true })
 export class Review {
@@ -366,7 +366,7 @@ export class Review {
 }
 ```
 
-#### **Log Schema**
+#### **Esquema Log**
 ```typescript
 @Schema({ timestamps: true })
 export class Log {
@@ -377,7 +377,7 @@ export class Log {
   message: string;
 
   @Prop({ required: true })
-  service: string; // Which service generated the log
+  service: string; // Qué servicio generó el log
 
   @Prop()
   userId?: number;
@@ -405,299 +405,299 @@ export class Log {
 }
 ```
 
-## 🚀 Project Setup & Installation
+## 🚀 Configuración e Instalación del Proyecto
 
-### Prerequisites
-- **Node.js** (v18 or higher)
-- **npm** or **yarn**
-- **PostgreSQL** database (Neon recommended)
-- **MongoDB** database (Atlas recommended)
+### Prerrequisitos
+- **Node.js** (v18 o superior)
+- **npm** o **yarn**
+- **Base de datos PostgreSQL** (se recomienda Neon)
+- **Base de datos MongoDB** (se recomienda Atlas)
 
-### Environment Variables
-Create a `.env` file in the root directory:
+### Variables de Entorno
+Crea un archivo `.env` en el directorio raíz:
 
 ```bash
-# Database Configuration
+# Configuración de Base de Datos
 DATABASE_URL=postgresql://username:password@host:port/database
 MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/database
 
-# JWT Configuration
-JWT_SECRET=your-super-secure-jwt-secret
+# Configuración JWT
+JWT_SECRET=tu-secreto-jwt-super-seguro
 JWT_EXPIRES_IN=3600s
 
-# Email Configuration
-MAIL_USER=your-email@gmail.com
-MAIL_PASS=your-email-app-password
+# Configuración de Email
+MAIL_USER=tu-email@gmail.com
+MAIL_PASS=tu-contraseña-app-email
 
-# Server Configuration
+# Configuración del Servidor
 PORT=3030
 DB_SYNC=false
 DB_LOGGING=false
 ```
 
-### Installation & Setup
+### Instalación y Configuración
 
 ```bash
-# Install dependencies
+# Instalar dependencias
 $ npm install
 
-# Database setup (run these in order)
-$ npm run db:reset      # Reset database
-$ npm run db:migrate    # Run migrations
-$ npm run db:seed       # Seed initial data
+# Configuración de base de datos (ejecutar en este orden)
+$ npm run db:reset      # Resetear base de datos
+$ npm run db:migrate    # Ejecutar migraciones
+$ npm run db:seed       # Sembrar datos iniciales
 
-# Development
+# Desarrollo
 $ npm run start:dev
 
-# Production
+# Producción
 $ npm run build
 $ npm run start:prod
 ```
 
-## 📡 API Documentation
+## 📡 Documentación API
 
-### Base URL
-- **Production**: `https://ecommerce-blog-backend.onrender.com`
-- **Development**: `http://localhost:3030`
+### URL Base
+- **Producción**: `https://ecommerce-blog-backend.onrender.com`
+- **Desarrollo**: `http://localhost:3030`
 
-### Authentication Endpoints
+### Endpoints de Autenticación
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `POST` | `/auth/register` | Create new user account | ❌ |
-| `POST` | `/auth/login` | Authenticate user | ❌ |
-| `GET` | `/auth/profile` | Get current user profile | ✅ |
+| Método | Endpoint | Descripción | Autenticación Requerida |
+|--------|----------|-------------|------------------------|
+| `POST` | `/auth/register` | Crear nueva cuenta de usuario | ❌ |
+| `POST` | `/auth/login` | Autenticar usuario | ❌ |
+| `GET` | `/auth/profile` | Obtener perfil del usuario actual | ✅ |
 
-### User Management
+### Gestión de Usuarios
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/users` | List all users | ✅ Admin |
-| `POST` | `/users` | Create new user | ✅ Admin |
-| `GET` | `/users/:id` | Get user by ID | ✅ |
-| `PUT` | `/users/:id` | Update user | ✅ |
-| `DELETE` | `/users/:id` | Delete user | ✅ Admin |
+| Método | Endpoint | Descripción | Autenticación Requerida |
+|--------|----------|-------------|------------------------|
+| `GET` | `/users` | Listar todos los usuarios | ✅ Admin |
+| `POST` | `/users` | Crear nuevo usuario | ✅ Admin |
+| `GET` | `/users/:id` | Obtener usuario por ID | ✅ |
+| `PUT` | `/users/:id` | Actualizar usuario | ✅ |
+| `DELETE` | `/users/:id` | Eliminar usuario | ✅ Admin |
 
-### Product Management
+### Gestión de Productos
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/products` | List all products | ❌ |
-| `GET` | `/products/:id` | Get product by ID | ❌ |
-| `POST` | `/admin/products` | Create new product | ✅ Admin |
-| `PUT` | `/products/:id` | Update product | ✅ Admin |
-| `DELETE` | `/admin/products/:id` | Delete product | ✅ Admin |
+| Método | Endpoint | Descripción | Autenticación Requerida |
+|--------|----------|-------------|------------------------|
+| `GET` | `/products` | Listar todos los productos | ❌ |
+| `GET` | `/products/:id` | Obtener producto por ID | ❌ |
+| `POST` | `/admin/products` | Crear nuevo producto | ✅ Admin |
+| `PUT` | `/products/:id` | Actualizar producto | ✅ Admin |
+| `DELETE` | `/admin/products/:id` | Eliminar producto | ✅ Admin |
 
-### Category Management
+### Gestión de Categorías
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/categories` | List all categories | ❌ |
-| `GET` | `/categories/:id` | Get category by ID | ❌ |
-| `POST` | `/categories` | Create new category | ✅ Admin |
-| `PUT` | `/categories/:id` | Update category | ✅ Admin |
-| `DELETE` | `/categories/:id` | Delete category | ✅ Admin |
+| Método | Endpoint | Descripción | Autenticación Requerida |
+|--------|----------|-------------|------------------------|
+| `GET` | `/categories` | Listar todas las categorías | ❌ |
+| `GET` | `/categories/:id` | Obtener categoría por ID | ❌ |
+| `POST` | `/categories` | Crear nueva categoría | ✅ Admin |
+| `PUT` | `/categories/:id` | Actualizar categoría | ✅ Admin |
+| `DELETE` | `/categories/:id` | Eliminar categoría | ✅ Admin |
 
-### Order Management
+### Gestión de Pedidos
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/orders` | List all orders | ✅ Admin |
-| `GET` | `/orders/:id` | Get order by ID | ✅ |
-| `POST` | `/orders` | Create new order | ✅ |
-| `PUT` | `/orders/:id` | Update order status | ✅ Admin |
-| `DELETE` | `/orders/:id` | Delete order | ✅ Admin |
+| Método | Endpoint | Descripción | Autenticación Requerida |
+|--------|----------|-------------|------------------------|
+| `GET` | `/orders` | Listar todos los pedidos | ✅ Admin |
+| `GET` | `/orders/:id` | Obtener pedido por ID | ✅ |
+| `POST` | `/orders` | Crear nuevo pedido | ✅ |
+| `PUT` | `/orders/:id` | Actualizar estado del pedido | ✅ Admin |
+| `DELETE` | `/orders/:id` | Eliminar pedido | ✅ Admin |
 
-### System & Health
+### Sistema y Salud
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| `GET` | `/` | API health check | ❌ |
-| `GET` | `/health/db` | Database status | ❌ |
-| `POST` | `/dev/seed-all-data` | Seed development data | ❌ |
-| `POST` | `/admin/hard-reset-database` | Reset database | ✅ Admin |
+| Método | Endpoint | Descripción | Autenticación Requerida |
+|--------|----------|-------------|------------------------|
+| `GET` | `/` | Verificación de salud de la API | ❌ |
+| `GET` | `/health/db` | Estado de la base de datos | ❌ |
+| `POST` | `/dev/seed-all-data` | Sembrar datos de desarrollo | ❌ |
+| `POST` | `/admin/hard-reset-database` | Resetear base de datos | ✅ Admin |
 
-### Request/Response Examples
+### Ejemplos de Request/Response
 
-#### Authentication
+#### Autenticación
 ```bash
-# Register new user
+# Registrar nuevo usuario
 POST /auth/register
 {
-  "email": "user@example.com",
-  "password": "securePassword123",
-  "firstName": "John",
-  "lastName": "Doe"
+  "email": "usuario@example.com",
+  "password": "contraseñaSegura123",
+  "firstName": "Juan",
+  "lastName": "Pérez"
 }
 
-# Response
+# Respuesta
 {
   "success": true,
   "data": {
-    "user": { "id": 1, "email": "user@example.com", ... },
+    "user": { "id": 1, "email": "usuario@example.com", ... },
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
   }
 }
 ```
 
-#### Product Creation
+#### Creación de Producto
 ```bash
-# Create product (Admin only)
+# Crear producto (Solo Admin)
 POST /admin/products
 Authorization: Bearer <token>
 {
-  "name": "Gaming Laptop",
-  "description": "High-performance gaming laptop",
+  "name": "Laptop Gaming",
+  "description": "Laptop de alto rendimiento para gaming",
   "price": "1299.99",
   "stock": 50,
   "categoryId": 1,
-  "images": ["https://example.com/image1.jpg"]
+  "images": ["https://example.com/imagen1.jpg"]
 }
 ```
 
-## 🧪 Testing
+## 🧪 Pruebas
 
 ```bash
-# Unit tests
+# Pruebas unitarias
 $ npm run test
 
-# E2E tests
+# Pruebas E2E
 $ npm run test:e2e
 
-# Test coverage
+# Cobertura de pruebas
 $ npm run test:cov
 
-# Watch mode
+# Modo observación
 $ npm run test:watch
 ```
 
-### Test Database Setup
+### Configuración de Base de Datos de Pruebas
 ```bash
-# Create test database
+# Crear base de datos de pruebas
 $ npm run test:db:setup
 
-# Run tests with test database
+# Ejecutar pruebas con base de datos de pruebas
 $ npm run test:db
 ```
 
-## 🚀 Deployment
+## 🚀 Despliegue
 
-### Render Deployment (Current)
+### Despliegue en Render (Actual)
 
-This application is deployed on [Render](https://render.com) with the following configuration:
+Esta aplicación está desplegada en [Render](https://render.com) con la siguiente configuración:
 
-**Live API**: `https://ecommerce-blog-backend.onrender.com`
+**API en Vivo**: `https://ecommerce-blog-backend.onrender.com`
 
-#### Environment Variables (Render Dashboard)
+#### Variables de Entorno (Panel de Render)
 ```bash
 DATABASE_URL=postgresql://username:password@host:port/database
 MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/database
-JWT_SECRET=your-jwt-secret
+JWT_SECRET=tu-secreto-jwt
 JWT_EXPIRES_IN=3600s
-MAIL_USER=your-email@gmail.com
-MAIL_PASS=your-email-password
+MAIL_USER=tu-email@gmail.com
+MAIL_PASS=tu-contraseña-email
 PORT=3030
 DB_SYNC=false
 DB_LOGGING=false
 ```
 
-#### Deployment Steps
-1. Connect your GitHub repository to Render
-2. Configure environment variables in Render dashboard
-3. Set build command: `npm install && npm run build`
-4. Set start command: `npm run start:prod`
-5. Deploy automatically on git push
+#### Pasos de Despliegue
+1. Conectar tu repositorio de GitHub a Render
+2. Configurar variables de entorno en el panel de Render
+3. Establecer comando de construcción: `npm install && npm run build`
+4. Establecer comando de inicio: `npm run start:prod`
+5. Desplegar automáticamente en git push
 
-### Alternative Deployment Options
+### Opciones Alternativas de Despliegue
 
-#### Docker Deployment
+#### Despliegue con Docker
 ```bash
-# Build Docker image
+# Construir imagen Docker
 $ docker build -t blog-ecommerce-api .
 
-# Run with environment variables
+# Ejecutar con variables de entorno
 $ docker run -p 3030:3030 --env-file .env blog-ecommerce-api
 ```
 
-#### Manual VPS Deployment
+#### Despliegue Manual en VPS
 ```bash
-# Clone repository
-$ git clone <repository-url>
+# Clonar repositorio
+$ git clone <url-del-repositorio>
 $ cd backend-blog-ecommerce
 
-# Install dependencies
+# Instalar dependencias
 $ npm install
 
-# Build application
+# Construir aplicación
 $ npm run build
 
-# Start with PM2
+# Iniciar con PM2
 $ npm install -g pm2
 $ pm2 start dist/main.js --name "blog-ecommerce-api"
 ```
 
-## 🔒 Security Features
+## 🔒 Características de Seguridad
 
-### Authentication & Authorization
-- **JWT Tokens**: Secure stateless authentication
-- **bcrypt Hashing**: Password encryption with salt rounds
-- **Role-based Access**: Admin and customer role separation
-- **Route Guards**: Protected endpoints with authentication checks
+### Autenticación y Autorización
+- **Tokens JWT**: Autenticación sin estado segura
+- **Encriptación bcrypt**: Cifrado de contraseñas con salt rounds
+- **Acceso basado en Roles**: Separación de roles admin y cliente
+- **Guardias de Rutas**: Endpoints protegidos con verificación de autenticación
 
-### Data Validation
-- **Class Validator**: DTO validation for all inputs
-- **TypeScript**: Compile-time type checking
-- **Sanitization**: Input sanitization to prevent XSS
+### Validación de Datos
+- **Class Validator**: Validación DTO para todas las entradas
+- **TypeScript**: Verificación de tipos en tiempo de compilación
+- **Sanitización**: Sanitización de entradas para prevenir XSS
 
-### Database Security
-- **Parameterized Queries**: SQL injection prevention
-- **Connection Encryption**: SSL/TLS for database connections
-- **Environment Variables**: Sensitive data protection
+### Seguridad de Base de Datos
+- **Consultas Parametrizadas**: Prevención de inyección SQL
+- **Cifrado de Conexión**: SSL/TLS para conexiones de base de datos
+- **Variables de Entorno**: Protección de datos sensibles
 
-## 📊 Performance & Scalability
+## 📊 Rendimiento y Escalabilidad
 
-### Database Optimization
-- **Indexed Columns**: Primary keys, foreign keys, and search fields
-- **Connection Pooling**: Efficient database connection management
-- **Query Optimization**: Efficient TypeORM and Mongoose queries
+### Optimización de Base de Datos
+- **Columnas Indexadas**: Claves primarias, foráneas y campos de búsqueda
+- **Pool de Conexiones**: Gestión eficiente de conexiones de base de datos
+- **Optimización de Consultas**: Consultas eficientes con TypeORM y Mongoose
 
-### Caching Strategy
-- **Response Caching**: API response caching for static data
-- **Database Query Caching**: TypeORM query result caching
-- **Static Asset Caching**: Image and file caching
+### Estrategia de Caché
+- **Caché de Respuestas**: Caché de respuestas API para datos estáticos
+- **Caché de Consultas de BD**: Caché de resultados de consultas TypeORM
+- **Caché de Assets Estáticos**: Caché de imágenes y archivos
 
-### Monitoring & Logging
-- **Structured Logging**: MongoDB-based log storage
-- **Error Tracking**: Comprehensive error logging and monitoring
-- **Health Checks**: Database and service health endpoints
+### Monitoreo y Registro
+- **Registro Estructurado**: Almacenamiento de logs basado en MongoDB
+- **Seguimiento de Errores**: Registro y monitoreo integral de errores
+- **Verificaciones de Salud**: Endpoints de salud de base de datos y servicios
 
-## 🛠️ Development Tools
+## 🛠️ Herramientas de Desarrollo
 
-### Code Quality
-- **ESLint**: Code linting and style enforcement
-- **Prettier**: Code formatting
-- **TypeScript**: Static type checking
-- **Husky**: Git hooks for code quality
+### Calidad de Código
+- **ESLint**: Linting y aplicación de estilo de código
+- **Prettier**: Formateo de código
+- **TypeScript**: Verificación de tipos estáticos
+- **Husky**: Hooks de Git para calidad de código
 
-### Database Tools
-- **TypeORM CLI**: Database migration and schema management
-- **MongoDB Compass**: Database visualization and querying
-- **pgAdmin**: PostgreSQL database administration
+### Herramientas de Base de Datos
+- **CLI de TypeORM**: Migración de base de datos y gestión de esquemas
+- **MongoDB Compass**: Visualización y consulta de base de datos
+- **pgAdmin**: Administración de base de datos PostgreSQL
 
-### API Development
-- **Postman Collections**: Pre-configured API testing
-- **Swagger/OpenAPI**: API documentation (coming soon)
-- **Thunder Client**: VS Code API testing extension
+### Desarrollo de API
+- **Colecciones Postman**: Pruebas de API preconfiguradas
+- **Swagger/OpenAPI**: Documentación de API (próximamente)
+- **Thunder Client**: Extensión de VS Code para pruebas de API
 
-## 📈 Future Enhancements
+## 📈 Mejoras Futuras
 
-### Planned Features
-- [ ] **GraphQL API**: Alternative to REST endpoints
-- [ ] **Redis Caching**: Advanced caching layer
-- [ ] **File Upload**: Image and document upload functionality
-- [ ] **Real-time Features**: WebSocket implementation
-- [ ] **API Rate Limiting**: Request throttling and protection
-- [ ] **Comprehensive Testing**: Unit and integration test coverage
+### Características Planificadas
+- [ ] **API GraphQL**: Alternativa a endpoints REST
+- [ ] **Caché Redis**: Capa de caché avanzada
+- [ ] **Subida de Archivos**: Funcionalidad de subida de imágenes y documentos
+- [ ] **Características en Tiempo Real**: Implementación WebSocket
+- [ ] **Limitación de Tasa de API**: Throttling y protección de solicitudes
+- [ ] **Pruebas Integrales**: Cobertura de pruebas unitarias e de integración
 - [ ] **API Documentation**: Swagger/OpenAPI integration
 - [ ] **Monitoring Dashboard**: Application performance monitoring
 
@@ -718,66 +718,70 @@ $ pm2 start dist/main.js --name "blog-ecommerce-api"
 6. Push to the branch (`git push origin feature/amazing-feature`)
 7. Open a Pull Request
 
-### Code Standards
-- Follow TypeScript best practices
-- Use meaningful variable and function names
-- Write comprehensive JSDoc comments
-- Maintain test coverage above 80%
-- Follow the existing code style and patterns
+- [ ] **Documentación Swagger**: Documentación interactiva de API
+- [ ] **Notificaciones Email**: Sistema de notificaciones por correo
+- [ ] **Análisis y Reportes**: Dashboard de métricas y análisis
 
-## 📋 Troubleshooting
+### Estándares de Código
+- Seguir las mejores prácticas de TypeScript
+- Usar nombres significativos para variables y funciones
+- Escribir comentarios JSDoc comprehensivos
+- Mantener cobertura de pruebas por encima del 80%
+- Seguir el estilo y patrones de código existentes
 
-### Common Issues
+## 📋 Solución de Problemas
 
-#### Database Connection Issues
+### Problemas Comunes
+
+#### Problemas de Conexión a Base de Datos
 ```bash
-# Check database connectivity
+# Verificar conectividad de base de datos
 $ npm run health:db
 
-# Reset database
+# Resetear base de datos
 $ npm run db:reset
 
-# Recreate schema
+# Recrear esquema
 $ npm run db:migrate
 ```
 
-#### Authentication Problems
+#### Problemas de Autenticación
 ```bash
-# Verify JWT secret configuration
-# Check token expiration settings
-# Ensure proper header format: "Bearer <token>"
+# Verificar configuración de secreto JWT
+# Revisar configuración de expiración de tokens
+# Asegurar formato correcto de header: "Bearer <token>"
 ```
 
-#### Deployment Issues
+#### Problemas de Despliegue
 ```bash
-# Check environment variables
-# Verify database URLs
-# Check build logs in Render dashboard
+# Verificar variables de entorno
+# Verificar URLs de base de datos
+# Revisar logs de construcción en el panel de Render
 ```
 
-## 📞 Support & Contact
+## 📞 Soporte y Contacto
 
-### Resources
-- **Documentation**: [API Documentation](#api-documentation)
-- **Database Guide**: [Database Models](#database-models)
-- **Deployment Guide**: [RENDER_ENV_GUIDE.md](./RENDER_ENV_GUIDE.md)
-- **Postman Collection**: [Import Guide](./POSTMAN_IMPORT_GUIDE.md)
+### Recursos
+- **Documentación**: [Documentación de API](#documentación-api)
+- **Guía de Base de Datos**: [Modelos de Base de Datos](#modelos-de-base-de-datos)
+- **Guía de Despliegue**: [RENDER_ENV_GUIDE.md](./RENDER_ENV_GUIDE.md)
+- **Colección Postman**: [Guía de Importación](./POSTMAN_IMPORT_GUIDE.md)
 
-### Getting Help
-- Create an issue for bugs or feature requests
-- Check existing documentation and guides
-- Review the troubleshooting section above
+### Obtener Ayuda
+- Crear un issue para bugs o solicitudes de características
+- Revisar documentación y guías existentes
+- Consultar la sección de solución de problemas arriba
 
 ---
 
-## 📄 License
+## 📄 Licencia
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Este proyecto está licenciado bajo la Licencia MIT - consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
 
 <p align="center">
-  Built with ❤️ using <a href="https://nestjs.com">NestJS</a> • 
+  Construido con ❤️ usando <a href="https://nestjs.com">NestJS</a> • 
   <a href="https://www.postgresql.org">PostgreSQL</a> • 
   <a href="https://www.mongodb.com">MongoDB</a>
 </p>
