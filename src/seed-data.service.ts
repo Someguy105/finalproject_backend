@@ -109,19 +109,55 @@ export class SeedDataService {
     const categoryData = [
       {
         name: 'Electronics',
-        description: 'Electronic devices, gadgets, and accessories'
+        description: 'Electronic devices, gadgets, and accessories',
+        slug: 'electronics',
+        image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+        isActive: true,
+        sortOrder: 1,
+        metadata: {
+          color: '#1976d2',
+          icon: 'devices',
+          featured: true
+        }
       },
       {
         name: 'Clothing',
-        description: 'Fashion apparel and accessories for all ages'
+        description: 'Fashion apparel and accessories for all ages',
+        slug: 'clothing',
+        image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+        isActive: true,
+        sortOrder: 2,
+        metadata: {
+          color: '#9c27b0',
+          icon: 'checkroom',
+          featured: true
+        }
       },
       {
         name: 'Books',
-        description: 'Physical and digital books, magazines, and educational materials'
+        description: 'Physical and digital books, magazines, and educational materials',
+        slug: 'books',
+        image: 'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+        isActive: true,
+        sortOrder: 3,
+        metadata: {
+          color: '#f57c00',
+          icon: 'menu_book',
+          featured: false
+        }
       },
       {
         name: 'Home & Garden',
-        description: 'Home improvement, furniture, and gardening supplies'
+        description: 'Home improvement, furniture, and gardening supplies',
+        slug: 'home-garden',
+        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+        isActive: true,
+        sortOrder: 4,
+        metadata: {
+          color: '#388e3c',
+          icon: 'home',
+          featured: false
+        }
       }
     ];
 
